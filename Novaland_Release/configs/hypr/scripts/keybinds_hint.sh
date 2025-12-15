@@ -62,23 +62,20 @@ EOF
 # Lưu ý: Dùng dấu gạch đứng | để chia cột
 # Đã cập nhật theo hyprland.conf của Neonova_solara
 data="
-🚀  | SUPER + R        | Mở Menu Ứng Dụng (App Launcher)
-   | SUPER + Q        | Mở Terminal (Kitty)
-   | SUPER + E        | Mở Trình Quản Lý File (Thunar)
-   | SUPER + M        | Mở Menu Nguồn (Power Menu)
-🔒  | SUPER + L        | Khóa Màn Hình (Lock Screen)
-🖼   | SUPER + W        | Đổi Hình Nền (Wallpaper Switcher)
-🎮  | SUPER + G        | Bật/Tắt Game Mode (Hiệu năng cao)
-⌨   | SUPER + K        | Hiện Bảng Phím Tắt Này
-📸  | PrtSc            | Chụp Vùng + Chỉnh Sửa (Swappy)
-   | SUPER + PrtSc    | Chụp Toàn Màn Hình (Lưu Ảnh)
-📋  | SHIFT + PrtSc    | Chụp Vùng (Lưu vào Clipboard)
-✕   | SUPER + C        | Đóng Cửa Sổ Hiện Tại
-   | SUPER + V        | Bật/Tắt Cửa Sổ Nổi (Floating)
-   | SUPER + Arrows   | Di Chuyển Tiêu Điểm Cửa Sổ
-   | ALT + TAB        | Chuyển Workspace (Tất cả)
-   | SUPER + TAB      | Chuyển Workspace (Có App đang mở)
-☀   | FN Keys          | Tăng/Giảm Độ Sáng & Âm Lượng
+🚀  | SUPER + R        | Open App Launcher
+   | SUPER + Q        | Open Terminal (Kitty)
+   | SUPER + E        | Open File Manager (Thunar)
+   | SUPER + M        | Open Power Menu
+🔒  | SUPER + L        | Lock Screen
+🖼   | SUPER + W        | Wallpaper Switcher
+🎮  | SUPER + G        | Toggle Game Mode
+⌨   | SUPER + K        | Show this Cheatsheet
+📸  | PrtSc            | Capture Region
+   | SUPER + PrtSc    | Full Screen Capture (immediate save)
+📋  | SHIFT + PrtSc    | Capture Region (Copy to Clipboard)
+✕   | SUPER + C        | Close hovered window
+   | SUPER + V        | Toggle Float Window
+   | ALT + TAB        | Switch Workspace (SUPER + TAB also work wtf)
 "
 
 
