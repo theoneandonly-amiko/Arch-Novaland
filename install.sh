@@ -46,7 +46,9 @@ if [ "$LANG_OPT" == "2" ]; then
     MSG_INSTALL_PKG="Đang cài đặt các gói cần thiết (Không bao gồm SDDM & Fcitx)..."
     MSG_BACKUP="Đang sao lưu config cũ vào: $BACKUP_DIR"
     MSG_FIX_PATH="Đang cập nhật đường dẫn user và cấu hình..."
+    MSG_MONITOR_FIX="Đang cấu hình Hyprland tự nhận diện màn hình tốt nhất..."
     MSG_COPY="Đang sao chép file cấu hình vào máy..."
+    MSG_WALLPAPER="Đang sao chép hình nền vào ~/Pictures/Wallpapers..."
     MSG_SDDM_ASK="Bạn có muốn cài đặt và kích hoạt SDDM + Theme Sugar Candy không? (y/n): "
     MSG_SDDM_INSTALL="Đang cài đặt các gói SDDM và Theme (cần mật khẩu sudo)..."
     MSG_DONE="CÀI ĐẶT HOÀN TẤT! Hãy khởi động lại máy để tận hưởng."
@@ -61,7 +63,9 @@ else
     MSG_INSTALL_PKG="Installing dependencies (Excluding SDDM & Fcitx)..."
     MSG_BACKUP="Backing up old configs to: $BACKUP_DIR"
     MSG_FIX_PATH="Updating user paths and configs..."
+    MSG_MONITOR_FIX="Configuring Hyprland to auto-detect best monitor mode..."
     MSG_COPY="Copying configuration files..."
+    MSG_WALLPAPER="Copying wallpapers to ~/Pictures/Wallpapers..."
     MSG_SDDM_ASK="Do you want to install and enable SDDM + Sugar Candy Theme? (y/n): "
     MSG_SDDM_INSTALL="Installing SDDM packages and Theme..."
     MSG_DONE="INSTALLATION COMPLETE! Please reboot your system."
@@ -98,7 +102,6 @@ PKGS=(
     rofi-wayland
     swaync
     wlogout
-    fastfetch
     
     # --- Terminal & Shell ---
     kitty
@@ -136,6 +139,8 @@ PKGS=(
     
     # --- Scripts Support ---
     python-requests
+    
+    # ĐÃ GỠ: fcitx5* và sddm* khỏi danh sách này theo yêu cầu
 )
 
 # Cài Yay nếu chưa có
@@ -163,10 +168,16 @@ echo -e "${YELLOW}$MSG_FIX_PATH${NC}"
 find "$SRC_DIR" -type f -exec sed -i "s|/home/$ORIGIN_USER|/home/$CURRENT_USER|g" {} +
 
 # Vô hiệu hóa fcitx5 trong config hyprland vì đã gỡ bỏ gói cài đặt
-# Tránh việc hyprland báo lỗi command not found
 if [ -f "$SRC_DIR/configs/hypr/hyprland.conf" ]; then
     sed -i 's/^exec-once = fcitx5/# exec-once = fcitx5/g' "$SRC_DIR/configs/hypr/hyprland.conf"
-    echo "  -> Disabled fcitx5 autostart in hyprland.conf"
+fi
+
+# [NEW] Cấu hình Monitor tự động nhận diện (highres, auto)
+echo -e "${YELLOW}$MSG_MONITOR_FIX${NC}"
+if [ -f "$SRC_DIR/configs/hypr/hyprland.conf" ]; then
+    # Tìm dòng bắt đầu bằng monitor= và thay thế bằng cấu hình auto
+    sed -i 's/^monitor=.*/monitor=,highres,auto,1/g' "$SRC_DIR/configs/hypr/hyprland.conf"
+    echo "  -> Updated monitor config to: monitor=,highres,auto,1"
 fi
 
 # --- 4. BACKUP OLD CONFIGS ---
@@ -187,10 +198,25 @@ cp -r "$SRC_DIR/configs/"* "$HOME/.config/"
 chmod +x "$HOME/.config/hypr/scripts/"*.sh
 chmod +x "$HOME/.config/waybar/scripts/"*
 
-# Setup Wallpaper folder
+# [NEW] Sao chép Wallpapers
+echo -e "${GREEN}$MSG_WALLPAPER${NC}"
 mkdir -p "$HOME/Pictures/Wallpapers"
-if [ -f "$SRC_DIR/sddm_theme/Backgrounds/Mountain.jpg" ]; then
-    cp "$SRC_DIR/sddm_theme/Backgrounds/Mountain.jpg" "$HOME/Pictures/Wallpapers/Default_Novaland.jpg"
+
+# 1. Tìm thư mục wallpapers trong nguồn (nếu bạn đóng gói thư mục tên là 'wallpapers')
+if [ -d "$SRC_DIR/wallpapers" ]; then
+    cp -r "$SRC_DIR/wallpapers/"* "$HOME/Pictures/Wallpapers/"
+    echo "  -> Copied from $SRC_DIR/wallpapers"
+# 2. Nếu không thấy, copy từ sddm backgrounds như phương án dự phòng
+elif [ -d "$SRC_DIR/sddm_theme/Backgrounds" ]; then
+    cp "$SRC_DIR/sddm_theme/Backgrounds/"* "$HOME/Pictures/Wallpapers/"
+    echo "  -> Copied from SDDM Backgrounds"
+fi
+
+# Copy thêm file Stargazing-min.png nếu nó nằm lẻ bên ngoài (check theo config cũ của bạn)
+# Nếu bạn để file ảnh này ở đâu đó khác trong repo, hãy đảm bảo script này tìm thấy nó
+# Ví dụ: nếu nó nằm trong configs/hypr/wallpapers/
+if [ -d "$SRC_DIR/configs/hypr/wallpapers" ]; then
+    cp -r "$SRC_DIR/configs/hypr/wallpapers/"* "$HOME/Pictures/Wallpapers/"
 fi
 
 # --- 6. INSTALL SDDM THEME (Optional) ---
@@ -199,10 +225,10 @@ read -r INSTALL_SDDM
 if [[ "$INSTALL_SDDM" =~ ^[Yy]$ ]]; then
     echo -e "${BLUE}$MSG_SDDM_INSTALL${NC}"
     
-    # Cài đặt các gói SDDM + theme Sugar Candy Git tại đây
+    # Cài đặt các gói SDDM + theme Sugar Candy Git
     $AUR_HELPER -S --needed sddm sddm-sugar-candy-git qt5-graphicaleffects qt5-quickcontrols2 qt5-svg --noconfirm
 
-    # Copy theme riêng Novaland (nếu có trong gói tải về)
+    # Copy theme riêng Novaland
     sudo mkdir -p /usr/share/sddm/themes
     if [ -d "$SRC_DIR/sddm_theme" ]; then
         sudo cp -r "$SRC_DIR/sddm_theme" /usr/share/sddm/themes/Novaland
@@ -213,7 +239,7 @@ if [[ "$INSTALL_SDDM" =~ ^[Yy]$ ]]; then
         sudo mkdir -p /etc/sddm.conf.d
     fi
     
-    # Mặc định dùng theme Novaland. Nếu bạn muốn dùng Sugar Candy gốc thì đổi Current=sugar-candy
+    # Mặc định dùng theme Novaland.
     echo "[Theme]
 Current=Novaland" | sudo tee /etc/sddm.conf.d/theme.conf > /dev/null
     
