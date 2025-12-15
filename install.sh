@@ -104,6 +104,7 @@ PKGS=(
     rofi-wayland
     swaync
     wlogout
+    fastfetch
     
     # --- Terminal & Shell ---
     kitty
@@ -142,10 +143,7 @@ PKGS=(
     # --- Scripts Support ---
     python-requests
     
-    # ĐÃ GỠ: fcitx5* và sddm* khỏi danh sách này theo yêu cầu
-)
-
-# Cài Yay nếu chưa có
+    # Đ nếu chưa có
 if ! command -v yay &> /dev/null && ! command -v paru &> /dev/null; then
     echo -e "${BLUE}$MSG_INSTALL_YAY${NC}"
     sudo pacman -S --needed git base-devel --noconfirm
