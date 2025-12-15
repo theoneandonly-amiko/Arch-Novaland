@@ -6,6 +6,10 @@
 #  Description: Automated setup script for Hyprland Novaland Rice
 # ==============================================================================
 
+# Dừng script ngay lập tức nếu có lệnh bị lỗi
+set -e
+set -o pipefail
+
 # --- VARIABLES ---
 LOG="install.log"
 BACKUP_DIR="$HOME/.config/Novaland_Backup_$(date +%Y%m%d_%H%M%S)"
@@ -19,6 +23,15 @@ YELLOW="\033[1;33m"
 RED="\033[0;31m"
 BLUE="\033[0;34m"
 NC="\033[0m" # No Color
+
+# Hàm ghi log
+log_msg() {
+    echo -e "$1" | tee -a "$LOG"
+}
+
+# Xóa log cũ
+rm -f "$LOG"
+touch "$LOG"
 
 # --- LANGUAGE SELECTION ---
 clear
@@ -39,11 +52,11 @@ read -p "Select language / Chọn ngôn ngữ (1/2): " LANG_OPT
 if [ "$LANG_OPT" == "2" ]; then
     MSG_START="Bắt đầu cài đặt Arch Novaland..."
     MSG_ERR_ROOT="LỖI: Không chạy script này bằng quyền root (sudo). Hãy chạy với user thường."
-    MSG_ERR_SRC="LỖI: Không tìm thấy thư mục '$SRC_DIR'. Hãy đảm bảo bạn đã giải nén đúng quy trình."
+    MSG_ERR_SRC="LỖI: Không tìm thấy thư mục '$SRC_DIR'. Hãy đảm bảo bạn đang chạy script nằm CẠNH thư mục này."
     MSG_CHECK_ARCH="Đang kiểm tra hệ thống..."
     MSG_NOT_ARCH="CẢNH BÁO: Bạn không dùng Arch Linux. Script có thể lỗi."
-    MSG_INSTALL_YAY="Không thấy AUR Helper. Đang cài đặt yay..."
-    MSG_INSTALL_PKG="Đang cài đặt các gói cần thiết (Không bao gồm SDDM & Fcitx)..."
+    MSG_UPDATE_SYS="Đang cập nhật cơ sở dữ liệu gói (pacman -Sy)..."
+    MSG_INSTALL_PKG="Đang cài đặt các gói cần thiết (Core)..."
     MSG_BACKUP="Đang sao lưu config cũ vào: $BACKUP_DIR"
     MSG_FIX_PATH="Đang cập nhật đường dẫn user và cấu hình..."
     MSG_MONITOR_FIX="Đang cấu hình Hyprland tự nhận diện màn hình tốt nhất..."
@@ -52,6 +65,7 @@ if [ "$LANG_OPT" == "2" ]; then
     MSG_INSTALL_P10K="Đang tải theme Powerlevel10k..."
     MSG_ZSH_COPY="Đang cài đặt cấu hình Zsh (.zshrc)..."
     MSG_WALLPAPER="Đang sao chép hình nền vào ~/Pictures/Wallpapers..."
+    MSG_WALLPAPER_FIX="Đang sửa lỗi hình nền (trỏ về ảnh mặc định)..."
     MSG_SDDM_ASK="Bạn có muốn cài đặt và kích hoạt SDDM + Theme Sugar Candy không? (y/n): "
     MSG_SDDM_INSTALL="Đang cài đặt các gói SDDM và Theme (cần mật khẩu sudo)..."
     MSG_DONE="CÀI ĐẶT HOÀN TẤT! Hãy khởi động lại máy để tận hưởng."
@@ -62,8 +76,8 @@ else
     MSG_ERR_SRC="ERROR: Directory '$SRC_DIR' not found."
     MSG_CHECK_ARCH="Checking system..."
     MSG_NOT_ARCH="WARNING: You are not on Arch Linux."
-    MSG_INSTALL_YAY="AUR Helper not found. Installing yay..."
-    MSG_INSTALL_PKG="Installing dependencies (Excluding SDDM & Fcitx)..."
+    MSG_UPDATE_SYS="Updating package database (pacman -Sy)..."
+    MSG_INSTALL_PKG="Installing dependencies (Core)..."
     MSG_BACKUP="Backing up old configs to: $BACKUP_DIR"
     MSG_FIX_PATH="Updating user paths and configs..."
     MSG_MONITOR_FIX="Configuring Hyprland to auto-detect best monitor mode..."
@@ -72,6 +86,7 @@ else
     MSG_INSTALL_P10K="Downloading Powerlevel10k theme..."
     MSG_ZSH_COPY="Installing Zsh configuration (.zshrc)..."
     MSG_WALLPAPER="Copying wallpapers to ~/Pictures/Wallpapers..."
+    MSG_WALLPAPER_FIX="Fixing wallpaper config (pointing to default image)..."
     MSG_SDDM_ASK="Do you want to install and enable SDDM + Sugar Candy Theme? (y/n): "
     MSG_SDDM_INSTALL="Installing SDDM packages and Theme..."
     MSG_DONE="INSTALLATION COMPLETE! Please reboot your system."
@@ -80,157 +95,105 @@ fi
 
 # --- 1. PRE-CHECKS ---
 if [ "$EUID" -eq 0 ]; then
-    echo -e "${RED}$MSG_ERR_ROOT${NC}"
+    log_msg "${RED}$MSG_ERR_ROOT${NC}"
     exit 1
 fi
 
 if [ ! -d "$SRC_DIR" ]; then
-    echo -e "${RED}$MSG_ERR_SRC${NC}"
+    log_msg "${RED}$MSG_ERR_SRC${NC}"
+    echo "Current Dir: $(pwd)"
+    echo "Expected: $(pwd)/$SRC_DIR"
     exit 1
 fi
 
-echo -e "${GREEN}$MSG_START${NC}"
+log_msg "${GREEN}$MSG_START${NC}"
+log_msg "Log file: $(pwd)/$LOG"
 
 if [ ! -f /etc/arch-release ]; then
-    echo -e "${YELLOW}$MSG_NOT_ARCH${NC}"
+    log_msg "${YELLOW}$MSG_NOT_ARCH${NC}"
     sleep 3
 fi
 
-# --- 2. INSTALL DEPENDENCIES ---
-echo -e "${YELLOW}$MSG_INSTALL_PKG${NC}"
+# --- 2. UPDATE & INSTALL DEPENDENCIES ---
+log_msg "${YELLOW}$MSG_UPDATE_SYS${NC}"
+sudo pacman -Sy --noconfirm 2>&1 | tee -a "$LOG"
+
+log_msg "${YELLOW}$MSG_INSTALL_PKG${NC}"
 
 PKGS=(
-    # --- Core Components ---
-    hyprland
-    hyprpaper
-    hyprlock
-    waybar
-    rofi-wayland
-    swaync
-    wlogout
-    fastfetch
-    
-    # --- Terminal & Shell ---
-    kitty
-    zsh
-    curl # Cần để cài Oh My Zsh
-    git  # Cần để cài Oh My Zsh
-    
-    # --- File Manager ---
-    thunar
-    
-    # --- Audio & Media ---
-    pipewire
-    wireplumber
-    pavucontrol
-    playerctl
-    cava
-    
-    # --- System Utilities ---
-    brightnessctl
-    libnotify
-    power-profiles-daemon
-    polkit-gnome
-    wl-clipboard
-    grim
-    slurp
-    swappy
-    
-    # --- Network & Bluetooth ---
-    nm-connection-editor
-    network-manager-applet
-    blueman
-    
-    # --- Fonts ---
-    ttf-jetbrains-mono-nerd
-    ttf-hack-nerd
-    noto-fonts-emoji
-    
-    # --- Scripts Support ---
-    python-requests
+    hyprland hyprpaper hyprlock waybar rofi-wayland swaync wlogout
+    kitty zsh curl git thunar
+    pipewire wireplumber pavucontrol playerctl cava
+    brightnessctl libnotify power-profiles-daemon polkit-gnome
+    wl-clipboard grim slurp swappy
+    nm-connection-editor network-manager-applet blueman
+    ttf-jetbrains-mono-nerd ttf-hack-nerd noto-fonts-emoji
+    python-requests fastfetch
 )
 
-# Cài Yay nếu chưa có
 if ! command -v yay &> /dev/null && ! command -v paru &> /dev/null; then
-    echo -e "${BLUE}$MSG_INSTALL_YAY${NC}"
-    sudo pacman -S --needed git base-devel --noconfirm
-    git clone https://aur.archlinux.org/yay.git
+    log_msg "${BLUE}Installing yay...${NC}"
+    sudo pacman -S --needed git base-devel --noconfirm >> "$LOG" 2>&1
+    git clone https://aur.archlinux.org/yay.git >> "$LOG" 2>&1
     cd yay
-    makepkg -si --noconfirm
+    makepkg -si --noconfirm >> "$LOG" 2>&1
     cd ..
     rm -rf yay
 fi
 
 AUR_HELPER=$(command -v paru || command -v yay)
-$AUR_HELPER -S --needed "${PKGS[@]}" --noconfirm
+if ! $AUR_HELPER -S --needed "${PKGS[@]}" --noconfirm 2>&1 | tee -a "$LOG"; then
+    log_msg "${RED}❌ LỖI: Cài đặt thất bại. Vui lòng kiểm tra file $LOG.${NC}"
+    exit 1
+fi
 
-# Enable services quan trọng
-echo -e "${BLUE}Enabling services (Bluetooth, Power Profile)...${NC}"
-sudo systemctl enable --now bluetooth
-sudo systemctl enable --now power-profiles-daemon
+log_msg "${BLUE}Enabling services...${NC}"
+sudo systemctl enable --now bluetooth >> "$LOG" 2>&1 || true
+sudo systemctl enable --now power-profiles-daemon >> "$LOG" 2>&1 || true
 
 # --- 3. FIX PATHS & PREPARE ---
-echo -e "${YELLOW}$MSG_FIX_PATH${NC}"
-# Sửa đường dẫn username
+log_msg "${YELLOW}$MSG_FIX_PATH${NC}"
 find "$SRC_DIR" -type f -exec sed -i "s|/home/$ORIGIN_USER|/home/$CURRENT_USER|g" {} +
 
-# Vô hiệu hóa fcitx5 trong config hyprland vì đã gỡ bỏ gói cài đặt
 if [ -f "$SRC_DIR/configs/hypr/hyprland.conf" ]; then
     sed -i 's/^exec-once = fcitx5/# exec-once = fcitx5/g' "$SRC_DIR/configs/hypr/hyprland.conf"
 fi
 
-# [NEW] Cấu hình Monitor tự động nhận diện (highres, auto)
-echo -e "${YELLOW}$MSG_MONITOR_FIX${NC}"
+log_msg "${YELLOW}$MSG_MONITOR_FIX${NC}"
 if [ -f "$SRC_DIR/configs/hypr/hyprland.conf" ]; then
-    # Tìm dòng bắt đầu bằng monitor= và thay thế bằng cấu hình auto
     sed -i 's/^monitor=.*/monitor=,highres,auto,1/g' "$SRC_DIR/configs/hypr/hyprland.conf"
-    echo "  -> Updated monitor config to: monitor=,highres,auto,1"
 fi
 
 # --- 4. BACKUP OLD CONFIGS ---
-echo -e "${BLUE}$MSG_BACKUP${NC}"
+log_msg "${BLUE}$MSG_BACKUP${NC}"
 mkdir -p "$BACKUP_DIR"
 for folder in hypr waybar rofi kitty cava wlogout swaync; do
     if [ -d "$HOME/.config/$folder" ]; then
         mv "$HOME/.config/$folder" "$BACKUP_DIR/"
     fi
 done
-
-# Backup .zshrc nếu có
-if [ -f "$HOME/.zshrc" ]; then
-    mv "$HOME/.zshrc" "$BACKUP_DIR/"
-fi
+if [ -f "$HOME/.zshrc" ]; then mv "$HOME/.zshrc" "$BACKUP_DIR/"; fi
 
 # --- 5. COPY CONFIGS ---
-echo -e "${GREEN}$MSG_COPY${NC}"
+log_msg "${GREEN}$MSG_COPY${NC}"
 mkdir -p "$HOME/.config"
 cp -r "$SRC_DIR/configs/"* "$HOME/.config/"
 
-# [NEW] Install Oh My Zsh (Trước khi copy .zshrc của Novaland)
-echo -e "${YELLOW}$MSG_INSTALL_OMZ${NC}"
+# [NEW] Install Oh My Zsh & P10k
+log_msg "${YELLOW}$MSG_INSTALL_OMZ${NC}"
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
-    # Cài đặt không giám sát (unattended) để script không bị dừng lại chờ user
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-    echo "  -> Oh My Zsh installed successfully."
-else
-    echo "  -> Oh My Zsh already installed. Skipping..."
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended >> "$LOG" 2>&1 || true
 fi
 
-# [NEW] Install Powerlevel10k Theme
-echo -e "${YELLOW}$MSG_INSTALL_P10K${NC}"
+log_msg "${YELLOW}$MSG_INSTALL_P10K${NC}"
 P10K_DIR="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
 if [ ! -d "$P10K_DIR" ]; then
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$P10K_DIR"
-    echo "  -> Powerlevel10k installed."
-else
-    echo "  -> Powerlevel10k already installed. Skipping..."
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$P10K_DIR" >> "$LOG" 2>&1
 fi
 
-# [NEW] Cài đặt Zsh Config (.zshrc)
-echo -e "${GREEN}$MSG_ZSH_COPY${NC}"
+# [NEW] Copy Zshrc
+log_msg "${GREEN}$MSG_ZSH_COPY${NC}"
 ZSHRC_FOUND=0
-
-# Tìm file .zshrc trong thư mục gốc hoặc configs của bộ cài
 if [ -f "$SRC_DIR/.zshrc" ]; then
     cp "$SRC_DIR/.zshrc" "$HOME/"
     ZSHRC_FOUND=1
@@ -239,74 +202,71 @@ elif [ -f "$SRC_DIR/configs/.zshrc" ]; then
     ZSHRC_FOUND=1
 fi
 
-# Copy thêm file powerlevel10k nếu có
-if [ -f "$SRC_DIR/.p10k.zsh" ]; then
-    cp "$SRC_DIR/.p10k.zsh" "$HOME/"
-fi
+if [ -f "$SRC_DIR/.p10k.zsh" ]; then cp "$SRC_DIR/.p10k.zsh" "$HOME/"; fi
+if [ -f "$SRC_DIR/configs/.p10k.zsh" ]; then cp "$SRC_DIR/configs/.p10k.zsh" "$HOME/"; fi
 
 if [ $ZSHRC_FOUND -eq 1 ]; then
-    echo "  -> Installed .zshrc to $HOME"
-    # Fix lại path user trong .zshrc vừa copy
     sed -i "s|/home/$ORIGIN_USER|/home/$CURRENT_USER|g" "$HOME/.zshrc"
+    log_msg "  -> Installed .zshrc"
 else
-    echo -e "${YELLOW}  -> Warning: .zshrc not found in source directory.${NC}"
+    log_msg "${YELLOW}  -> Warning: .zshrc not found.${NC}"
 fi
 
-# Cấp quyền thực thi script
 chmod +x "$HOME/.config/hypr/scripts/"*.sh
 chmod +x "$HOME/.config/waybar/scripts/"*
 
-# [NEW] Sao chép Wallpapers
-echo -e "${GREEN}$MSG_WALLPAPER${NC}"
+# [NEW] Wallpapers & Fix
+log_msg "${GREEN}$MSG_WALLPAPER${NC}"
 mkdir -p "$HOME/Pictures/Wallpapers"
 
-# 1. Tìm thư mục wallpapers trong nguồn (nếu bạn đóng gói thư mục tên là 'wallpapers')
+# Copy wallpapers (ưu tiên thư mục wallpapers nếu có, không thì lấy từ SDDM)
 if [ -d "$SRC_DIR/wallpapers" ]; then
     cp -r "$SRC_DIR/wallpapers/"* "$HOME/Pictures/Wallpapers/"
-    echo "  -> Copied from $SRC_DIR/wallpapers"
-# 2. Nếu không thấy, copy từ sddm backgrounds như phương án dự phòng
-elif [ -d "$SRC_DIR/sddm_theme/Backgrounds" ]; then
-    cp "$SRC_DIR/sddm_theme/Backgrounds/"* "$HOME/Pictures/Wallpapers/"
-    echo "  -> Copied from SDDM Backgrounds"
 fi
-
-# Copy thêm file Stargazing-min.png nếu nó nằm lẻ bên ngoài (check theo config cũ của bạn)
-# Nếu bạn để file ảnh này ở đâu đó khác trong repo, hãy đảm bảo script này tìm thấy nó
-# Ví dụ: nếu nó nằm trong configs/hypr/wallpapers/
+if [ -d "$SRC_DIR/sddm_theme/Backgrounds" ]; then
+    cp -r "$SRC_DIR/sddm_theme/Backgrounds/"* "$HOME/Pictures/Wallpapers/"
+    # Đổi tên Mountain.jpg thành Default_Novaland.jpg cho đồng bộ
+    if [ -f "$HOME/Pictures/Wallpapers/Mountain.jpg" ]; then
+        cp "$HOME/Pictures/Wallpapers/Mountain.jpg" "$HOME/Pictures/Wallpapers/Default_Novaland.jpg"
+    fi
+fi
 if [ -d "$SRC_DIR/configs/hypr/wallpapers" ]; then
     cp -r "$SRC_DIR/configs/hypr/wallpapers/"* "$HOME/Pictures/Wallpapers/"
 fi
 
-# --- 6. INSTALL SDDM THEME (Optional) ---
+# [NEW] Tự động sửa config hyprpaper để trỏ vào ảnh mặc định
+log_msg "${YELLOW}$MSG_WALLPAPER_FIX${NC}"
+if [ -f "$HOME/.config/hypr/hyprpaper.conf" ]; then
+    # Thay thế file ảnh bị thiếu (Stargazing-min.png) bằng ảnh mặc định (Default_Novaland.jpg)
+    sed -i "s|Stargazing-min.png|Default_Novaland.jpg|g" "$HOME/.config/hypr/hyprpaper.conf"
+    log_msg "  -> Fixed hyprpaper.conf to use Default_Novaland.jpg"
+fi
+
+# --- 6. INSTALL SDDM THEME ---
 echo -ne "${YELLOW}$MSG_SDDM_ASK${NC}"
 read -r INSTALL_SDDM
 if [[ "$INSTALL_SDDM" =~ ^[Yy]$ ]]; then
-    echo -e "${BLUE}$MSG_SDDM_INSTALL${NC}"
+    log_msg "${BLUE}$MSG_SDDM_INSTALL${NC}"
     
-    # Cài đặt các gói SDDM + theme Sugar Candy Git
-    $AUR_HELPER -S --needed sddm sddm-sugar-candy-git qt5-graphicaleffects qt5-quickcontrols2 qt5-svg --noconfirm
-
-    # Copy theme riêng Novaland
-    sudo mkdir -p /usr/share/sddm/themes
-    if [ -d "$SRC_DIR/sddm_theme" ]; then
-        sudo cp -r "$SRC_DIR/sddm_theme" /usr/share/sddm/themes/Novaland
-    fi
-    
-    # Tạo config file cho SDDM
-    if [ ! -d "/etc/sddm.conf.d" ]; then
-        sudo mkdir -p /etc/sddm.conf.d
-    fi
-    
-    # Mặc định dùng theme Novaland.
-    echo "[Theme]
+    if ! $AUR_HELPER -S --needed sddm sddm-sugar-candy-git qt5-graphicaleffects qt5-quickcontrols2 qt5-svg --noconfirm 2>&1 | tee -a "$LOG"; then
+         log_msg "${RED}Lỗi cài đặt SDDM. Kiểm tra log.${NC}"
+    else
+        sudo mkdir -p /usr/share/sddm/themes
+        if [ -d "$SRC_DIR/sddm_theme" ]; then
+            sudo cp -r "$SRC_DIR/sddm_theme" /usr/share/sddm/themes/Novaland
+        fi
+        if [ ! -d "/etc/sddm.conf.d" ]; then sudo mkdir -p /etc/sddm.conf.d; fi
+        
+        echo "[Theme]
 Current=Novaland" | sudo tee /etc/sddm.conf.d/theme.conf > /dev/null
-    
-    sudo systemctl enable sddm
-    echo "  -> SDDM installed and enabled."
+        
+        sudo systemctl enable sddm >> "$LOG" 2>&1 || true
+        log_msg "  -> SDDM installed and enabled."
+    fi
 fi
 
 # --- FINISH ---
-echo -e "${GREEN}======================================${NC}"
-echo -e "${GREEN}$MSG_DONE${NC}"
-echo -e "${YELLOW}$MSG_ZSH_NOTE${NC}"
-echo -e "${GREEN}======================================${NC}"
+log_msg "${GREEN}======================================${NC}"
+log_msg "${GREEN}$MSG_DONE${NC}"
+log_msg "${YELLOW}$MSG_ZSH_NOTE${NC}"
+log_msg "${GREEN}======================================${NC}"
