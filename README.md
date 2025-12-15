@@ -77,5 +77,22 @@ chmod +x install.sh
 # 🤝 Credits
 - Configuration & Rice: Neonova Solara (Amiko)
 - Mascot Design & Art: Norielle
-- Base Components: Hyprland, Waybar, Rofi, Cava.
-- Made with ❤️ for the Linux and Hyprland Community!
+- Base Components: Hyprland, Waybar, Rofi, Cava, and a lot more!
+
+# ⚠️ License & Usage
+
+This project uses a Hybrid License model:
+
+💻 Code & Scripts
+
+- The configuration files, scripts (install.sh, weather.py), and CSS styling are released under the MIT License. You are free to use, modify, and distribute them.
+
+🎨 Artwork & Assets
+
+- The Mascot Character (Neonova Solara), Wallpapers, and associated artistic assets are the intellectual property of Norielle (02 Nori) and Neonova Solara.
+
+- These assets are provided for personal use only within this configuration.
+
+- Do not use these assets for commercial purposes, resell them, or claim them as your own work.
+
+Made with ❤️ for the Linux Community.
