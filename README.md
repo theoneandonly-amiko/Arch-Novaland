@@ -8,7 +8,7 @@ Chào mừng đến với Arch Novaland. Đây là bộ cấu hình Hyprland dà
 
 # 🖼️ Preview
 
-Screenshots coming soon...
+https://github.com/user-attachments/assets/df5c5904-0104-49d3-a53e-da35170d38ed
 
 # ✨ Features
 
