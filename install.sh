@@ -10,9 +10,7 @@
 LOG="install.log"
 BACKUP_DIR="$HOME/.config/Novaland_Backup_$(date +%Y%m%d_%H%M%S)"
 CURRENT_USER=$(whoami)
-# Username gốc trong config cần thay thế
-ORIGIN_USER="neonova_solara"
-# Tên thư mục chứa config (nằm cùng cấp với script này)
+ORIGIN_USER="neonova_solara" 
 SRC_DIR="Novaland_Release"
 
 # Colors
@@ -41,33 +39,33 @@ read -p "Select language / Chọn ngôn ngữ (1/2): " LANG_OPT
 if [ "$LANG_OPT" == "2" ]; then
     MSG_START="Bắt đầu cài đặt Arch Novaland..."
     MSG_ERR_ROOT="LỖI: Không chạy script này bằng quyền root (sudo). Hãy chạy với user thường."
-    MSG_ERR_SRC="LỖI: Không tìm thấy thư mục '$SRC_DIR'. Hãy đảm bảo bạn đã giải nén đúng quy trình (Thư mục '$SRC_DIR' phải nằm cạnh file install.sh)."
+    MSG_ERR_SRC="LỖI: Không tìm thấy thư mục '$SRC_DIR'. Hãy đảm bảo bạn đã giải nén đúng quy trình."
     MSG_CHECK_ARCH="Đang kiểm tra hệ thống..."
     MSG_NOT_ARCH="CẢNH BÁO: Bạn không dùng Arch Linux. Script có thể lỗi."
     MSG_INSTALL_YAY="Không thấy AUR Helper. Đang cài đặt yay..."
-    MSG_INSTALL_PKG="Đang cài đặt các gói cần thiết (Hyprland, Waybar, Rofi, Python Requests...)..."
+    MSG_INSTALL_PKG="Đang cài đặt các gói cần thiết (Không bao gồm SDDM & Fcitx)..."
     MSG_BACKUP="Đang sao lưu config cũ vào: $BACKUP_DIR"
-    MSG_FIX_PATH="Đang cập nhật đường dẫn user từ '$ORIGIN_USER' sang '$CURRENT_USER'..."
+    MSG_FIX_PATH="Đang cập nhật đường dẫn user và cấu hình..."
     MSG_COPY="Đang sao chép file cấu hình vào máy..."
-    MSG_SDDM_ASK="Bạn có muốn cài Theme màn hình đăng nhập (SDDM) không? (y/n): "
-    MSG_SDDM_INSTALL="Đang cài đặt SDDM Theme (cần mật khẩu sudo)..."
+    MSG_SDDM_ASK="Bạn có muốn cài đặt và kích hoạt SDDM + Theme Sugar Candy không? (y/n): "
+    MSG_SDDM_INSTALL="Đang cài đặt các gói SDDM và Theme (cần mật khẩu sudo)..."
     MSG_DONE="CÀI ĐẶT HOÀN TẤT! Hãy khởi động lại máy để tận hưởng."
-    MSG_ERR="Có lỗi xảy ra. Vui lòng kiểm tra lại."
+    MSG_ZSH_NOTE="LƯU Ý: Config Kitty sử dụng Zsh. Hãy đảm bảo bạn đổi shell mặc định bằng lệnh: chsh -s /usr/bin/zsh"
 else
     MSG_START="Starting Arch Novaland installation..."
-    MSG_ERR_ROOT="ERROR: Do not run this script as root (sudo). Run as normal user."
-    MSG_ERR_SRC="ERROR: Directory '$SRC_DIR' not found. Please ensure correct extraction (Directory '$SRC_DIR' must be next to install.sh)."
+    MSG_ERR_ROOT="ERROR: Do not run this script as root (sudo)."
+    MSG_ERR_SRC="ERROR: Directory '$SRC_DIR' not found."
     MSG_CHECK_ARCH="Checking system..."
-    MSG_NOT_ARCH="WARNING: You are not on Arch Linux. Proceed with caution."
+    MSG_NOT_ARCH="WARNING: You are not on Arch Linux."
     MSG_INSTALL_YAY="AUR Helper not found. Installing yay..."
-    MSG_INSTALL_PKG="Installing dependencies (Hyprland, Waybar, Rofi, Python Requests...)..."
+    MSG_INSTALL_PKG="Installing dependencies (Excluding SDDM & Fcitx)..."
     MSG_BACKUP="Backing up old configs to: $BACKUP_DIR"
-    MSG_FIX_PATH="Updating user paths from '$ORIGIN_USER' to '$CURRENT_USER'..."
+    MSG_FIX_PATH="Updating user paths and configs..."
     MSG_COPY="Copying configuration files..."
-    MSG_SDDM_ASK="Do you want to install the SDDM Login Theme? (y/n): "
-    MSG_SDDM_INSTALL="Installing SDDM Theme (sudo password required)..."
+    MSG_SDDM_ASK="Do you want to install and enable SDDM + Sugar Candy Theme? (y/n): "
+    MSG_SDDM_INSTALL="Installing SDDM packages and Theme..."
     MSG_DONE="INSTALLATION COMPLETE! Please reboot your system."
-    MSG_ERR="An error occurred."
+    MSG_ZSH_NOTE="NOTE: Kitty config uses Zsh. Make sure to change your default shell: chsh -s /usr/bin/zsh"
 fi
 
 # --- 1. PRE-CHECKS ---
@@ -78,13 +76,11 @@ fi
 
 if [ ! -d "$SRC_DIR" ]; then
     echo -e "${RED}$MSG_ERR_SRC${NC}"
-    echo "Expected path: $(pwd)/$SRC_DIR"
     exit 1
 fi
 
 echo -e "${GREEN}$MSG_START${NC}"
 
-# Check Arch
 if [ ! -f /etc/arch-release ]; then
     echo -e "${YELLOW}$MSG_NOT_ARCH${NC}"
     sleep 3
@@ -93,34 +89,52 @@ fi
 # --- 2. INSTALL DEPENDENCIES ---
 echo -e "${YELLOW}$MSG_INSTALL_PKG${NC}"
 
-# Danh sách gói đã thêm python-requests cho script weather
 PKGS=(
+    # --- Core Components ---
     hyprland
     hyprpaper
     hyprlock
     waybar
     rofi-wayland
-    kitty
-    thunar
-    cava
     swaync
     wlogout
+    fastfetch
+    
+    # --- Terminal & Shell ---
+    kitty
+    zsh
+    
+    # --- File Manager ---
+    thunar
+    
+    # --- Audio & Media ---
+    pipewire
+    wireplumber
+    pavucontrol
+    playerctl
+    cava
+    
+    # --- System Utilities ---
+    brightnessctl
+    libnotify
+    power-profiles-daemon
+    polkit-gnome
+    wl-clipboard
     grim
     slurp
     swappy
-    wl-clipboard
-    brightnessctl
-    playerctl
+    
+    # --- Network & Bluetooth ---
     nm-connection-editor
     network-manager-applet
     blueman
+    
+    # --- Fonts ---
     ttf-jetbrains-mono-nerd
+    ttf-hack-nerd
     noto-fonts-emoji
-    polkit-gnome
-    sddm
-    qt5-graphicaleffects
-    qt5-quickcontrols2
-    qt5-svg
+    
+    # --- Scripts Support ---
     python-requests
 )
 
@@ -138,10 +152,22 @@ fi
 AUR_HELPER=$(command -v paru || command -v yay)
 $AUR_HELPER -S --needed "${PKGS[@]}" --noconfirm
 
+# Enable services quan trọng
+echo -e "${BLUE}Enabling services (Bluetooth, Power Profile)...${NC}"
+sudo systemctl enable --now bluetooth
+sudo systemctl enable --now power-profiles-daemon
+
 # --- 3. FIX PATHS & PREPARE ---
 echo -e "${YELLOW}$MSG_FIX_PATH${NC}"
-# Tìm và thay thế username cũ bằng username mới trong thư mục nguồn trước khi copy
+# Sửa đường dẫn username
 find "$SRC_DIR" -type f -exec sed -i "s|/home/$ORIGIN_USER|/home/$CURRENT_USER|g" {} +
+
+# Vô hiệu hóa fcitx5 trong config hyprland vì đã gỡ bỏ gói cài đặt
+# Tránh việc hyprland báo lỗi command not found
+if [ -f "$SRC_DIR/configs/hypr/hyprland.conf" ]; then
+    sed -i 's/^exec-once = fcitx5/# exec-once = fcitx5/g' "$SRC_DIR/configs/hypr/hyprland.conf"
+    echo "  -> Disabled fcitx5 autostart in hyprland.conf"
+fi
 
 # --- 4. BACKUP OLD CONFIGS ---
 echo -e "${BLUE}$MSG_BACKUP${NC}"
@@ -149,7 +175,6 @@ mkdir -p "$BACKUP_DIR"
 for folder in hypr waybar rofi kitty cava wlogout swaync; do
     if [ -d "$HOME/.config/$folder" ]; then
         mv "$HOME/.config/$folder" "$BACKUP_DIR/"
-        echo "  -> Backed up $folder"
     fi
 done
 
@@ -158,38 +183,46 @@ echo -e "${GREEN}$MSG_COPY${NC}"
 mkdir -p "$HOME/.config"
 cp -r "$SRC_DIR/configs/"* "$HOME/.config/"
 
-# Cấp quyền thực thi cho các script con (bao gồm cả weather.py mới)
+# Cấp quyền thực thi script
 chmod +x "$HOME/.config/hypr/scripts/"*.sh
-chmod +x "$HOME/.config/waybar/scripts/"* # Cấp quyền cho cả folder scripts waybar để dính file .py và .sh
+chmod +x "$HOME/.config/waybar/scripts/"*
 
-# Tạo thư mục Wallpaper để tránh lỗi hyprpaper
+# Setup Wallpaper folder
 mkdir -p "$HOME/Pictures/Wallpapers"
 if [ -f "$SRC_DIR/sddm_theme/Backgrounds/Mountain.jpg" ]; then
     cp "$SRC_DIR/sddm_theme/Backgrounds/Mountain.jpg" "$HOME/Pictures/Wallpapers/Default_Novaland.jpg"
 fi
 
-# --- 6. INSTALL SDDM THEME ---
+# --- 6. INSTALL SDDM THEME (Optional) ---
 echo -ne "${YELLOW}$MSG_SDDM_ASK${NC}"
 read -r INSTALL_SDDM
 if [[ "$INSTALL_SDDM" =~ ^[Yy]$ ]]; then
     echo -e "${BLUE}$MSG_SDDM_INSTALL${NC}"
-    sudo mkdir -p /usr/share/sddm/themes
-    sudo cp -r "$SRC_DIR/sddm_theme" /usr/share/sddm/themes/Novaland
+    
+    # Cài đặt các gói SDDM + theme Sugar Candy Git tại đây
+    $AUR_HELPER -S --needed sddm sddm-sugar-candy-git qt5-graphicaleffects qt5-quickcontrols2 qt5-svg --noconfirm
 
+    # Copy theme riêng Novaland (nếu có trong gói tải về)
+    sudo mkdir -p /usr/share/sddm/themes
+    if [ -d "$SRC_DIR/sddm_theme" ]; then
+        sudo cp -r "$SRC_DIR/sddm_theme" /usr/share/sddm/themes/Novaland
+    fi
+    
     # Tạo config file cho SDDM
-    # Kiểm tra thư mục config sddm
     if [ ! -d "/etc/sddm.conf.d" ]; then
         sudo mkdir -p /etc/sddm.conf.d
     fi
-
+    
+    # Mặc định dùng theme Novaland. Nếu bạn muốn dùng Sugar Candy gốc thì đổi Current=sugar-candy
     echo "[Theme]
-Current=Novaland" | sudo tee /etc/sddm.conf.d/theme.conf.user > /dev/null
-
-    # Enable SDDM service
+Current=Novaland" | sudo tee /etc/sddm.conf.d/theme.conf > /dev/null
+    
     sudo systemctl enable sddm
-    echo "  -> SDDM Theme installed."
+    echo "  -> SDDM installed and enabled."
 fi
 
 # --- FINISH ---
 echo -e "${GREEN}======================================${NC}"
 echo -e "${GREEN}$MSG_DONE${NC}"
+echo -e "${YELLOW}$MSG_ZSH_NOTE${NC}"
+echo -e "${GREEN}======================================${NC}"
