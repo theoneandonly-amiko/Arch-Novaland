@@ -1,0 +1,14 @@
+xkb_keymap {
+    xkb_keycodes  { include "evdev+aliases(qwerty)" };
+    xkb_types     { include "complete" };
+    xkb_compat    { include "complete" };
+    xkb_symbols   {
+        include "pc+us+inet(evdev)"
+        
+        // Map the Scroll_Lock key to Mod3, which will tell Hyprland that
+        // Scroll_Lock is a Modifier Key, therefore Hyprland will not interfere
+        // with the Scroll_Lock and not shutting the LEDs off.
+        modifier_map Mod3 { Scroll_Lock };
+    };
+    xkb_geometry  { include "pc(pc105)" };
+};

@@ -1,0 +1,147 @@
+/* Nền tổng thể của Control Center */
+.control-center {
+  background: rgba(13, 15, 24, 0.9); /* Màu nền tối trong suốt */
+  border: 2px solid #2de2e6; /* Viền Cyan */
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(45, 226, 230, 0.2); /* Glow nhẹ */
+}
+
+/* Tiêu đề & Nút Clear */
+.control-center-header {
+    margin-bottom: 10px;
+}
+.control-center button.clear-all {
+    background: #1a1b26;
+    color: #ff4d4d;
+    border: 1px solid #ff4d4d;
+    border-radius: 6px;
+    padding: 8px;
+}
+.control-center button.clear-all:hover {
+    background: #ff4d4d;
+    color: #0d0f18;
+}
+
+/* Widget Label (DND, Muted...) */
+.widget-label > label {
+  color: #cdd6f4;
+  font-family: "JetBrainsMono Nerd Font";
+}
+
+/* Các nút gạt (Toggles) */
+.widget-dnd {
+    background: #1a1b26;
+    border: 1px solid #565f89;
+    border-radius: 6px;
+    margin: 5px;
+}
+.widget-dnd > switch:checked {
+    background: #f9c80e; /* Màu vàng khi bật */
+    border-color: #f9c80e;
+}
+
+/* THÔNG BÁO (NOTIFICATION POPUP) */
+.notification-row {
+  outline: none;
+  margin-bottom: 10px;
+}
+
+.notification {
+  background: rgba(26, 27, 38, 0.95);
+  border: 1px solid #2de2e6; /* Viền từng thông báo */
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+}
+
+.notification-content {
+  background: transparent;
+}
+
+.summary {
+  color: #2de2e6; /* Tiêu đề thông báo màu Cyan */
+  font-weight: bold;
+}
+
+.body {
+  color: #cdd6f4;
+}
+
+/* Thông báo khẩn cấp (Critical) */
+.notification.critical {
+  border: 2px solid #ff4d4d; /* Viền đỏ */
+  box-shadow: 0 0 10px rgba(255, 77, 77, 0.3);
+}/* Nền tổng thể của Control Center */
+.control-center {
+  background: rgba(13, 15, 24, 0.9); /* Màu nền tối trong suốt */
+  border: 2px solid #2de2e6; /* Viền Cyan */
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(45, 226, 230, 0.2); /* Glow nhẹ */
+}
+
+/* Tiêu đề & Nút Clear */
+.control-center-header {
+    margin-bottom: 10px;
+}
+.control-center button.clear-all {
+    background: #1a1b26;
+    color: #ff4d4d;
+    border: 1px solid #ff4d4d;
+    border-radius: 6px;
+    padding: 8px;
+}
+.control-center button.clear-all:hover {
+    background: #ff4d4d;
+    color: #0d0f18;
+}
+
+/* Widget Label (DND, Muted...) */
+.widget-label > label {
+  color: #cdd6f4;
+  font-family: "JetBrainsMono Nerd Font";
+}
+
+/* Các nút gạt (Toggles) */
+.widget-dnd {
+    background: #1a1b26;
+    border: 1px solid #565f89;
+    border-radius: 6px;
+    margin: 5px;
+}
+.widget-dnd > switch:checked {
+    background: #f9c80e; /* Màu vàng khi bật */
+    border-color: #f9c80e;
+}
+
+/* THÔNG BÁO (NOTIFICATION POPUP) */
+.notification-row {
+  outline: none;
+  margin-bottom: 10px;
+}
+
+.notification {
+  background: rgba(26, 27, 38, 0.95);
+  border: 1px solid #2de2e6; /* Viền từng thông báo */
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+}
+
+.notification-content {
+  background: transparent;
+}
+
+.summary {
+  color: #2de2e6; /* Tiêu đề thông báo màu Cyan */
+  font-weight: bold;
+}
+
+.body {
+  color: #cdd6f4;
+}
+
+/* Thông báo khẩn cấp (Critical) */
+.notification.critical {
+  border: 2px solid #ff4d4d; /* Viền đỏ */
+  box-shadow: 0 0 10px rgba(255, 77, 77, 0.3);
+}

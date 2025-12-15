@@ -1,0 +1,36 @@
+#!/usr/bin/env sh
+
+# Kiểm tra trạng thái hiện tại (Dựa vào việc animation có đang bật không)
+HYPRGAMEMODE=$(hyprctl getoption animations:enabled | awk 'NR==1{print $2}')
+
+if [ "$HYPRGAMEMODE" = 1 ] ; then
+    # --- KÍCH HOẠT GAMEMODE ---
+    
+    # 1. Tắt hết hiệu ứng Hyprland (Animation, Blur, Shadow, Bo góc)
+    hyprctl --batch "\
+        keyword animations:enabled 0;\
+        keyword decoration:drop_shadow 0;\
+        keyword decoration:blur:enabled 0;\
+        keyword general:gaps_in 0;\
+        keyword general:gaps_out 0;\
+        keyword general:border_size 1;\
+        keyword decoration:rounding 0"
+    
+    # 2. Bật chế độ hiệu năng cao (Performance)
+    powerprofilesctl set performance
+    
+    # 3. Thông báo
+    notify-send "GAMEMODE: ON" "🚀 Performance Mode Activated. Visuals Disabled." -u low -t 3000
+    
+else
+    # --- TẮT GAMEMODE (Về lại Novaland) ---
+    
+    # 1. Reload lại config Hyprland để khôi phục hiệu ứng
+    hyprctl reload
+    
+    # 2. Về chế độ cân bằng (Balanced)
+    powerprofilesctl set balanced
+    
+    # 3. Thông báo
+    notify-send "GAMEMODE: OFF" "✨ Welcome back to Novaland." -u low -t 3000
+fi

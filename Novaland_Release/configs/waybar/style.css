@@ -1,0 +1,137 @@
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "JetBrainsMono Nerd Font";
+    font-weight: bold;
+    font-size: 13px;
+    min-height: 0;
+}
+
+window#waybar {
+    background: transparent; /* Nền trong suốt để các module nổi lên */
+}
+
+/* --- TOOLTIP FIX (Quan trọng) --- */
+tooltip {
+    background: #0d0f18;
+    border: 2px solid #2de2e6;
+    border-radius: 5px;
+}
+tooltip label {
+    color: #cdd6f4;
+}
+
+/* --- BASE MODULE STYLE --- */
+.modules-left > widget:first-child > #workspaces {
+    margin-left: 0;
+}
+
+.modules-right > widget:last-child > #workspaces {
+    margin-right: 0;
+}
+
+/* Style chung cho các khối */
+#custom-launcher, #workspaces, #cpu, #memory, #temperature, 
+#customcava, #clock, #pulseaudio, #network, #battery, #tray, #custom-notification, #custom-weather {
+    background: #1a1b26; /* Nền xám xanh */
+    color: #cdd6f4;
+    padding: 0 10px;
+    margin: 0 3px;
+    border-bottom: 2px solid #1a1b26; /* Viền ẩn để tạo hiệu ứng hover */
+    border-radius: 4px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3); /* Đổ bóng nhẹ */
+}
+
+/* --- SPECIFIC COLORS --- */
+
+/* Launcher: Màu Cyan */
+#custom-launcher {
+    color: #2de2e6;
+    font-size: 18px;
+    padding: 0 10px;
+    border-bottom: 3px solid #2de2e6;
+}
+
+/* Workspaces */
+#workspaces button {
+    padding: 0 5px;
+    color: #565f89;
+}
+#workspaces button.active {
+    color: #f9c80e; /* Active màu vàng */
+}
+#workspaces {
+    border-bottom: 3px solid #f9c80e;
+}
+#custom-cava {
+    background: #1a1b26;
+    color: #2de2e6;
+    border-bottom: 2px solid #2de2e6;
+    
+    /* --- KHÓA CHIỀU RỘNG --- */
+    min-width: 120px; /* Bạn chỉnh số này sao cho vừa đủ chứa số lượng cột sóng */
+    
+    /* XÓA DÒNG text-align: center; ĐI NHÉ */
+    
+    padding: 0 10px;
+    margin: 0 3px;
+    border-radius: 4px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    
+    /* Quan trọng: Phải dùng font Monospace để các cột sóng đều nhau */
+    font-family: "Hack Nerd Font Mono", monospace; 
+}
+/* Hardware Info Group */
+#cpu { border-bottom: 3px solid #ff4d4d; color: #ff4d4d; }
+#memory { border-bottom: 3px solid #a9b1d6; color: #a9b1d6; }
+#temperature { border-bottom: 3px solid #ff9e64; color: #ff9e64; }
+
+/* Clock (To và nổi bật nhất) */
+#clock {
+    background: #0d0f18; /* Nền đen đậm hơn */
+    border: 2px solid #2de2e6; /* Viền bao quanh */
+    color: #2de2e6;
+    font-size: 14px;
+}
+
+/* Right Modules */
+#pulseaudio { border-bottom: 3px solid #f9c80e; }
+
+#custom-weather {
+    border-bottom: 3px solid #7aa2f7; /* Màu xanh da trời */
+    color: #7aa2f7;
+}
+
+#battery { border-bottom: 3px solid #2de2e6; }
+
+/* Notification Button */
+#custom-notification {
+    background: #0d0f18;
+    border: 1px solid #f9c80e;
+    color: #f9c80e;
+    padding: 0 12px;
+}
+
+#bluetooth {
+    background: #1a1b26;
+    color: #7aa2f7; /* Màu xanh Bluetooth đặc trưng */
+    padding: 0 14px;
+    margin: 0 4px;
+    border-bottom: 3px solid #7aa2f7;
+    border-radius: 4px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+}
+
+#bluetooth.connected {
+    color: #2de2e6; /* Khi kết nối thì sáng màu Cyan Neon */
+    border-bottom: 3px solid #2de2e6;
+}
+#backlight {
+    background: #1a1b26;
+    color: #f9c80e; /* Màu vàng Neon */
+    padding: 0 10px;
+    margin: 0 3px;
+    border-bottom: 2px solid #f9c80e;
+    border-radius: 4px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+}

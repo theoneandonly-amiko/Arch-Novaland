@@ -1,0 +1,92 @@
+configuration {
+    modi: "drun";
+    show-icons: true;
+    display-drun: "🚀 APPS";
+    drun-display-format: "{name}";
+    font: "JetBrainsMono Nerd Font Bold 11";
+}
+
+@theme "/dev/null"
+
+* {
+    bg: #0d0f18B3;      /* Nền tối trong suốt */
+    bg-alt: #1a1b26;    /* Nền thanh input */
+    fg: #cdd6f4;        /* Màu chữ */
+    accent: #2de2e6;    /* Màu Cyan Neon */
+    active: #f9c80e;    /* Màu Vàng */
+
+    background-color: transparent;
+    text-color: @fg;
+    margin: 0;
+    padding: 0;
+    spacing: 0;
+}
+
+window {
+    width: 40%;
+    height: 55%;
+    background-color: @bg;
+    border: 2px;
+    border-color: @accent;
+    border-radius: 12px;
+}
+
+mainbox {
+    children: [ inputbar, listview ];
+}
+
+inputbar {
+    background-color: @bg-alt;
+    padding: 12px;
+    margin: 10px 10px 0 10px;
+    border-radius: 8px;
+    children: [ prompt, entry ];
+}
+
+prompt {
+    text-color: @active;
+    padding: 0 10px 0 0;
+}
+
+entry {
+    placeholder: "Search...";
+    placeholder-color: #565f89;
+    text-color: @accent;
+}
+
+listview {
+    columns: 3;       /* 3 Cột */
+    lines: 3;         /* 3 Hàng */
+    cycle: true;      /* Cho phép cuộn vòng lặp */
+    dynamic: true;
+    layout: vertical;
+    margin: 10px;
+    spacing: 10px;
+}
+
+element {
+    orientation: vertical; /* Icon trên, Chữ dưới */
+    padding: 20px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+element selected {
+    background-color: #2de2e620;
+    border: 1px solid;          /* Khai báo độ dày và kiểu */
+    border-color: @accent;      /* Khai báo màu ở dòng riêng */
+    text-color: @accent;
+}
+
+element-icon {
+    size: 64px;       /* Icon to rõ */
+    horizontal-align: 0.5;
+    cursor: inherit;
+}
+
+element-text {
+    horizontal-align: 0.5;
+    vertical-align: 0.5;
+    margin: 10px 0 0 0;
+    cursor: inherit;
+}

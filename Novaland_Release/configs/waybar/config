@@ -1,0 +1,173 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 32, // Cao hơn chút để chứa box
+    "spacing": 4,
+    "margin-top": 4,
+    "margin-left": 8,
+    "margin-right": 8,
+
+    "modules-left": [
+        "custom/launcher",
+        "hyprland/workspaces",
+        "cpu",
+        "memory",
+        "temperature"
+    ],
+    "modules-center": [
+	"custom/cava",
+        "clock"
+    ],
+    "modules-right": [
+        "pulseaudio",
+	"backlight",
+        "custom/weather",
+        "bluetooth",
+	"battery",
+        "tray",
+        "custom/notification"
+    ],
+
+    // --- MODULES CONFIG ---
+
+    "custom/launcher": {
+        "format": "  ",
+        "on-click": "rofi -show drun",
+        "tooltip": false
+    },
+    
+    "custom/cava": {
+        "exec": "~/.config/waybar/scripts/cava.sh",
+        "format": "{}",
+        "restart-interval": 1,
+        "hide-empty-text": true
+    },
+
+    "hyprland/workspaces": {
+        "disable-scroll": true,
+        "all-outputs": true,
+        "format": "{icon}",
+        "format-icons": {
+            "active": "",
+            "default": ""
+        }
+    },
+
+    "cpu": {
+        "interval": 2,
+        "format": " {usage}%",
+        "tooltip": true
+    },
+
+    "memory": {
+        "interval": 2,
+        "format": " {percentage}%"
+    },
+
+    "temperature": {
+        "critical-threshold": 80,
+        "format": " {temperatureC}°C"
+    },
+
+    "clock": {
+        // Bỏ calendar ở format chính cho gọn, chỉ hiện giờ và ngày
+        "format": " {:%H:%M  |   %d/%m}",
+        "tooltip-format": "<tt><small>{calendar}</small></tt>",
+        "calendar": {
+            "mode"          : "year",
+            "mode-mon-col"  : 3,
+            "weeks-pos"     : "right",
+            "on-scroll"     : 1,
+            "format": {
+                "months":     "<span color='#ffead3'><b>{}</b></span>",
+                "days":       "<span color='#ecc6d9'><b>{}</b></span>",
+                "weeks":      "<span color='#99ffdd'><b>W{}</b></span>",
+                "weekdays":   "<span color='#ffcc66'><b>{}</b></span>",
+                "today":      "<span color='#ff6699'><b><u>{}</u></b></span>"
+            }
+        },
+
+        "actions":  {
+            "on-click-right": "mode",
+            "on-click-forward": "tz_up",
+            "on-click-backward": "tz_down",
+            "on-scroll-up": "shift_up",
+            "on-scroll-down": "shift_down"
+        }
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": "",
+        "format-icons": {
+            "default": ["", "", ""]
+        },
+        "on-click": "pavucontrol",
+        "scroll-step": 5
+    },
+    "backlight": {
+        "device": "intel_backlight",
+        "format": "{icon} {percent}%", // Giữ nguyên vì nó ngắn (VD: ☀ 50%)
+        "format-icons": ["󰃞", "󰃟", "󰃠"],
+        "on-scroll-up": "brightnessctl set 1%+",
+        "on-scroll-down": "brightnessctl set 1%-",
+        "tooltip": false
+    },    
+
+// Module thời tiết mới
+    "custom/weather": {
+        "format": "{} ",  // Format để trống vì script Python đã lo phần text
+        "exec": "~/.config/waybar/scripts/weather.py \"DaNang\"", // <--- ĐỔI ĐỊA ĐIỂM Ở ĐÂY
+        "return-type": "json",   // Bắt buộc dòng này để Waybar hiểu JSON từ Python
+        "interval": 5400,        // <--- ĐỔI TẦN SUẤT Ở ĐÂY (đơn vị: giây). 1800s = 30 phút
+        "on-click": "xdg-open https://wttr.in",
+        "tooltip": true          // Bật tooltip
+    },
+
+    "battery": {
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{icon} {capacity}%", // Ngắn gọn
+        "format-charging": "󰂄 {capacity}%",
+        "format-icons": ["", "", "", "", ""]
+    },
+
+    
+   "tray": {
+        "icon-size": 16,
+        "spacing": 10
+    },
+
+    "custom/notification": {
+        "tooltip": false,
+        "format": "{icon}",
+        "format-icons": {
+            "notification": "<span foreground='red'><sup></sup></span>",
+            "none": "",
+            "dnd-notification": "<span foreground='red'><sup></sup></span>",
+            "dnd-none": "",
+            "inhibited-notification": "<span foreground='red'><sup></sup></span>",
+            "inhibited-none": "",
+            "dnd-inhibited-notification": "<span foreground='red'><sup></sup></span>",
+            "dnd-inhibited-none": ""
+        },
+        "return-type": "json",
+        "exec-if": "which swaync-client",
+        "exec": "swaync-client -swb",
+        "on-click": "swaync-client -t -sw",
+        "on-click-right": "swaync-client -d -sw",
+        "escape": true
+    },
+
+"bluetooth": {
+        // Chỉ hiện Icon (Bỏ {status} hay {device_alias})
+        "format": "",
+        "format-disabled": "󰂲", // Icon bluetooth gạch chéo
+        "format-connected": "",
+        "tooltip-format": "{controller_alias}\t{controller_address}\n\n{num_connections} connected",
+        "tooltip-format-connected": "Connected: {device_alias}", // Rê chuột vào mới thấy tên thiết bị
+        "on-click": "blueman-manager"
+    },
+}
