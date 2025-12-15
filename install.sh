@@ -48,6 +48,7 @@ if [ "$LANG_OPT" == "2" ]; then
     MSG_FIX_PATH="Đang cập nhật đường dẫn user và cấu hình..."
     MSG_MONITOR_FIX="Đang cấu hình Hyprland tự nhận diện màn hình tốt nhất..."
     MSG_COPY="Đang sao chép file cấu hình vào máy..."
+    MSG_INSTALL_OMZ="Đang cài đặt Oh My Zsh..."
     MSG_ZSH_COPY="Đang cài đặt cấu hình Zsh (.zshrc)..."
     MSG_WALLPAPER="Đang sao chép hình nền vào ~/Pictures/Wallpapers..."
     MSG_SDDM_ASK="Bạn có muốn cài đặt và kích hoạt SDDM + Theme Sugar Candy không? (y/n): "
@@ -66,6 +67,7 @@ else
     MSG_FIX_PATH="Updating user paths and configs..."
     MSG_MONITOR_FIX="Configuring Hyprland to auto-detect best monitor mode..."
     MSG_COPY="Copying configuration files..."
+    MSG_INSTALL_OMZ="Installing Oh My Zsh..."
     MSG_ZSH_COPY="Installing Zsh configuration (.zshrc)..."
     MSG_WALLPAPER="Copying wallpapers to ~/Pictures/Wallpapers..."
     MSG_SDDM_ASK="Do you want to install and enable SDDM + Sugar Candy Theme? (y/n): "
@@ -109,6 +111,8 @@ PKGS=(
     # --- Terminal & Shell ---
     kitty
     zsh
+    curl # Cần để cài Oh My Zsh
+    git  # Cần để cài Oh My Zsh
     
     # --- File Manager ---
     thunar
@@ -143,7 +147,10 @@ PKGS=(
     # --- Scripts Support ---
     python-requests
     
-    # Đ nếu chưa có
+    # ĐÃ GỠ: fcitx5* và sddm* khỏi danh sách này theo yêu cầu
+)
+
+# Cài Yay nếu chưa có
 if ! command -v yay &> /dev/null && ! command -v paru &> /dev/null; then
     echo -e "${BLUE}$MSG_INSTALL_YAY${NC}"
     sudo pacman -S --needed git base-devel --noconfirm
@@ -198,6 +205,16 @@ fi
 echo -e "${GREEN}$MSG_COPY${NC}"
 mkdir -p "$HOME/.config"
 cp -r "$SRC_DIR/configs/"* "$HOME/.config/"
+
+# [NEW] Install Oh My Zsh (Trước khi copy .zshrc của Novaland)
+echo -e "${YELLOW}$MSG_INSTALL_OMZ${NC}"
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+    # Cài đặt không giám sát (unattended) để script không bị dừng lại chờ user
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    echo "  -> Oh My Zsh installed successfully."
+else
+    echo "  -> Oh My Zsh already installed. Skipping..."
+fi
 
 # [NEW] Cài đặt Zsh Config (.zshrc)
 echo -e "${GREEN}$MSG_ZSH_COPY${NC}"
