@@ -49,6 +49,7 @@ if [ "$LANG_OPT" == "2" ]; then
     MSG_MONITOR_FIX="Đang cấu hình Hyprland tự nhận diện màn hình tốt nhất..."
     MSG_COPY="Đang sao chép file cấu hình vào máy..."
     MSG_INSTALL_OMZ="Đang cài đặt Oh My Zsh..."
+    MSG_INSTALL_P10K="Đang tải theme Powerlevel10k..."
     MSG_ZSH_COPY="Đang cài đặt cấu hình Zsh (.zshrc)..."
     MSG_WALLPAPER="Đang sao chép hình nền vào ~/Pictures/Wallpapers..."
     MSG_SDDM_ASK="Bạn có muốn cài đặt và kích hoạt SDDM + Theme Sugar Candy không? (y/n): "
@@ -68,6 +69,7 @@ else
     MSG_MONITOR_FIX="Configuring Hyprland to auto-detect best monitor mode..."
     MSG_COPY="Copying configuration files..."
     MSG_INSTALL_OMZ="Installing Oh My Zsh..."
+    MSG_INSTALL_P10K="Downloading Powerlevel10k theme..."
     MSG_ZSH_COPY="Installing Zsh configuration (.zshrc)..."
     MSG_WALLPAPER="Copying wallpapers to ~/Pictures/Wallpapers..."
     MSG_SDDM_ASK="Do you want to install and enable SDDM + Sugar Candy Theme? (y/n): "
@@ -146,7 +148,6 @@ PKGS=(
     
     # --- Scripts Support ---
     python-requests
-
 )
 
 # Cài Yay nếu chưa có
@@ -213,6 +214,16 @@ if [ ! -d "$HOME/.oh-my-zsh" ]; then
     echo "  -> Oh My Zsh installed successfully."
 else
     echo "  -> Oh My Zsh already installed. Skipping..."
+fi
+
+# [NEW] Install Powerlevel10k Theme
+echo -e "${YELLOW}$MSG_INSTALL_P10K${NC}"
+P10K_DIR="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
+if [ ! -d "$P10K_DIR" ]; then
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$P10K_DIR"
+    echo "  -> Powerlevel10k installed."
+else
+    echo "  -> Powerlevel10k already installed. Skipping..."
 fi
 
 # [NEW] Cài đặt Zsh Config (.zshrc)
