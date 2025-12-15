@@ -85,11 +85,11 @@ This project uses a Hybrid License model:
 
 💻 Code & Scripts
 
-- The configuration files, scripts (install.sh, weather.py), and CSS styling are released under the MIT License. You are free to use, modify, and distribute them.
+- The configuration files, scripts (install.sh, weather.py), and CSS styling are released under the [**MIT License**](https://github.com/theoneandonly-amiko/Arch-Novaland/blob/main/LICENSE). You are free to use, modify, and distribute them.
 
 🎨 Artwork & Assets
 
-- The Mascot Character (Neonova Solara), Wallpapers, and associated artistic assets are the intellectual property of Norielle (02 Nori) and Neonova Solara.
+- The Mascot Character (Neonova Solara), Wallpapers, and associated artistic assets are the intellectual property of Norielle (02 Nori).
 
 - These assets are provided for personal use only within this configuration.
 
