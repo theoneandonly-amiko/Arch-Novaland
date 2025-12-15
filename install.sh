@@ -48,6 +48,7 @@ if [ "$LANG_OPT" == "2" ]; then
     MSG_FIX_PATH="Đang cập nhật đường dẫn user và cấu hình..."
     MSG_MONITOR_FIX="Đang cấu hình Hyprland tự nhận diện màn hình tốt nhất..."
     MSG_COPY="Đang sao chép file cấu hình vào máy..."
+    MSG_ZSH_COPY="Đang cài đặt cấu hình Zsh (.zshrc)..."
     MSG_WALLPAPER="Đang sao chép hình nền vào ~/Pictures/Wallpapers..."
     MSG_SDDM_ASK="Bạn có muốn cài đặt và kích hoạt SDDM + Theme Sugar Candy không? (y/n): "
     MSG_SDDM_INSTALL="Đang cài đặt các gói SDDM và Theme (cần mật khẩu sudo)..."
@@ -65,6 +66,7 @@ else
     MSG_FIX_PATH="Updating user paths and configs..."
     MSG_MONITOR_FIX="Configuring Hyprland to auto-detect best monitor mode..."
     MSG_COPY="Copying configuration files..."
+    MSG_ZSH_COPY="Installing Zsh configuration (.zshrc)..."
     MSG_WALLPAPER="Copying wallpapers to ~/Pictures/Wallpapers..."
     MSG_SDDM_ASK="Do you want to install and enable SDDM + Sugar Candy Theme? (y/n): "
     MSG_SDDM_INSTALL="Installing SDDM packages and Theme..."
@@ -189,10 +191,41 @@ for folder in hypr waybar rofi kitty cava wlogout swaync; do
     fi
 done
 
+# Backup .zshrc nếu có
+if [ -f "$HOME/.zshrc" ]; then
+    mv "$HOME/.zshrc" "$BACKUP_DIR/"
+fi
+
 # --- 5. COPY CONFIGS ---
 echo -e "${GREEN}$MSG_COPY${NC}"
 mkdir -p "$HOME/.config"
 cp -r "$SRC_DIR/configs/"* "$HOME/.config/"
+
+# [NEW] Cài đặt Zsh Config (.zshrc)
+echo -e "${GREEN}$MSG_ZSH_COPY${NC}"
+ZSHRC_FOUND=0
+
+# Tìm file .zshrc trong thư mục gốc hoặc configs của bộ cài
+if [ -f "$SRC_DIR/.zshrc" ]; then
+    cp "$SRC_DIR/.zshrc" "$HOME/"
+    ZSHRC_FOUND=1
+elif [ -f "$SRC_DIR/configs/.zshrc" ]; then
+    cp "$SRC_DIR/configs/.zshrc" "$HOME/"
+    ZSHRC_FOUND=1
+fi
+
+# Copy thêm file powerlevel10k nếu có
+if [ -f "$SRC_DIR/.p10k.zsh" ]; then
+    cp "$SRC_DIR/.p10k.zsh" "$HOME/"
+fi
+
+if [ $ZSHRC_FOUND -eq 1 ]; then
+    echo "  -> Installed .zshrc to $HOME"
+    # Fix lại path user trong .zshrc vừa copy
+    sed -i "s|/home/$ORIGIN_USER|/home/$CURRENT_USER|g" "$HOME/.zshrc"
+else
+    echo -e "${YELLOW}  -> Warning: .zshrc not found in source directory.${NC}"
+fi
 
 # Cấp quyền thực thi script
 chmod +x "$HOME/.config/hypr/scripts/"*.sh
