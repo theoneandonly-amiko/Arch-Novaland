@@ -1,0 +1,16 @@
+{
+  "enabled": "yes",
+  "bezier": {
+    "popInLong": [0.15, 1.0, 0.35, 1.0],
+    "curveUp": [0.28, 0.6, 0.42, 1.0]
+  },
+  "animations": [
+    ["layersIn", 1, 7, "popInLong", "popin 80%"],
+    ["layersOut", 1, 6, "curveUp", "fade"],
+    ["windows", 1, 8, "curveUp", "slide"],
+    ["windowsMove", 1, 5, "curveUp"],
+    ["border", 1, 8, "curveUp"],
+    ["workspaces", 1, 10, "curveUp", "slidevert"],
+    ["fadeDim", 1, 10, "curveUp"]
+  ]
+}
