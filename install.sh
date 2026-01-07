@@ -134,7 +134,8 @@ PKGS=(
     python-requests python-pyqt6 fastfetch
 )
 
-if ! command -v yay &> /dev/null && ! command -v paru &> /dev/null; then
+# [UPDATED] Chỉ kiểm tra và cài đặt yay (Bỏ paru do lỗi compile)
+if ! command -v yay &> /dev/null; then
     log_msg "${BLUE}Installing yay...${NC}"
     sudo pacman -S --needed git base-devel --noconfirm >> "$LOG" 2>&1
     git clone https://aur.archlinux.org/yay.git >> "$LOG" 2>&1
@@ -144,7 +145,8 @@ if ! command -v yay &> /dev/null && ! command -v paru &> /dev/null; then
     rm -rf yay
 fi
 
-AUR_HELPER=$(command -v paru || command -v yay)
+# Ép buộc dùng yay
+AUR_HELPER="yay"
 if ! $AUR_HELPER -S --needed "${PKGS[@]}" --noconfirm 2>&1 | tee -a "$LOG"; then
     log_msg "${RED}❌ LỖI: Cài đặt thất bại. Vui lòng kiểm tra file $LOG.${NC}"
     exit 1
