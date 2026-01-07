@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==============================================================================
-#  ARCH NOVALAND INSTALLER (Updated)
+#  ARCH NOVALAND INSTALLER (Updated for Novaland Center)
 #  Author: Neonova Solara
 #  Description: Automated setup script for Hyprland Novaland Rice
 #  Includes setup for: Novaland Center (PyQt6), Hyprpaper, Rofi, Waybar...
@@ -15,7 +15,7 @@ set -o pipefail
 LOG="install.log"
 BACKUP_DIR="$HOME/.config/Novaland_Backup_$(date +%Y%m%d_%H%M%S)"
 CURRENT_USER=$(whoami)
-# Thay đổi tên user gốc nếu cần, script sẽ tự replace bằng user hiện tại
+# Thay đổi tên user gốc trong config nếu cần (để sed replace)
 ORIGIN_USER="neonova_solara" 
 SRC_DIR="Novaland_Release"
 
@@ -122,7 +122,7 @@ sudo pacman -Sy --noconfirm 2>&1 | tee -a "$LOG"
 
 log_msg "${YELLOW}$MSG_INSTALL_PKG${NC}"
 
-# [UPDATED] Added python-pyqt6 for Novaland Center and jq/imagemagick for utilities
+# [UPDATED] Thêm python-pyqt6 (quan trọng cho Novaland Center) và imagemagick
 PKGS=(
     hyprland hyprpaper hyprlock waybar rofi-wayland swaync wlogout
     kitty zsh curl git thunar jq
@@ -182,6 +182,7 @@ if [ -f "$HOME/.zshrc" ]; then mv "$HOME/.zshrc" "$BACKUP_DIR/"; fi
 # --- 5. COPY CONFIGS ---
 log_msg "${GREEN}$MSG_COPY${NC}"
 mkdir -p "$HOME/.config"
+# Copy toàn bộ configs (bao gồm cả novaland_center.py và conf/ folder mới)
 cp -r "$SRC_DIR/configs/"* "$HOME/.config/"
 
 # [NEW] Install Oh My Zsh & P10k
@@ -217,8 +218,10 @@ else
     log_msg "${YELLOW}  -> Warning: .zshrc not found.${NC}"
 fi
 
-# [UPDATED] Cấp quyền thực thi cho cả script .sh và .py (cho Novaland Center)
+# [UPDATED] Cấp quyền thực thi cho các script (quan trọng cho Novaland Center)
+log_msg "${BLUE}Setting executable permissions...${NC}"
 chmod +x "$HOME/.config/hypr/scripts/"*.sh
+# Cấp quyền cho file python novaland_center.py
 chmod +x "$HOME/.config/hypr/scripts/"*.py 2>/dev/null || true
 chmod +x "$HOME/.config/waybar/scripts/"*
 
