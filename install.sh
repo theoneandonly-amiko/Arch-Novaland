@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # ==============================================================================
-#  ARCH NOVALAND INSTALLER
+#  ARCH NOVALAND INSTALLER (Updated)
 #  Author: Neonova Solara
 #  Description: Automated setup script for Hyprland Novaland Rice
+#  Includes setup for: Novaland Center (PyQt6), Hyprpaper, Rofi, Waybar...
 # ==============================================================================
 
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
@@ -14,6 +15,7 @@ set -o pipefail
 LOG="install.log"
 BACKUP_DIR="$HOME/.config/Novaland_Backup_$(date +%Y%m%d_%H%M%S)"
 CURRENT_USER=$(whoami)
+# Thay đổi tên user gốc nếu cần, script sẽ tự replace bằng user hiện tại
 ORIGIN_USER="neonova_solara" 
 SRC_DIR="Novaland_Release"
 
@@ -56,7 +58,7 @@ if [ "$LANG_OPT" == "2" ]; then
     MSG_CHECK_ARCH="Đang kiểm tra hệ thống..."
     MSG_NOT_ARCH="CẢNH BÁO: Bạn không dùng Arch Linux. Script có thể lỗi."
     MSG_UPDATE_SYS="Đang cập nhật cơ sở dữ liệu gói (pacman -Sy)..."
-    MSG_INSTALL_PKG="Đang cài đặt các gói cần thiết (Core)..."
+    MSG_INSTALL_PKG="Đang cài đặt các gói cần thiết (Hyprland, Python/PyQt6, Fonts)..."
     MSG_BACKUP="Đang sao lưu config cũ vào: $BACKUP_DIR"
     MSG_FIX_PATH="Đang cập nhật đường dẫn user và cấu hình..."
     MSG_MONITOR_FIX="Đang cấu hình Hyprland tự nhận diện màn hình tốt nhất..."
@@ -65,11 +67,11 @@ if [ "$LANG_OPT" == "2" ]; then
     MSG_INSTALL_P10K="Đang tải theme Powerlevel10k..."
     MSG_ZSH_COPY="Đang cài đặt cấu hình Zsh (.zshrc)..."
     MSG_WALLPAPER="Đang sao chép hình nền vào ~/Pictures/Wallpapers..."
-    MSG_WALLPAPER_FIX="Đang sửa lỗi hình nền (trỏ về ảnh mặc định)..."
+    MSG_WALLPAPER_FIX="Đang sửa lỗi config hình nền..."
     MSG_SDDM_ASK="Bạn có muốn cài đặt và kích hoạt SDDM + Theme Sugar Candy không? (y/n): "
     MSG_SDDM_INSTALL="Đang cài đặt các gói SDDM và Theme (cần mật khẩu sudo)..."
     MSG_DONE="CÀI ĐẶT HOÀN TẤT! Hãy khởi động lại máy để tận hưởng."
-    MSG_ZSH_NOTE="LƯU Ý: Config Kitty sử dụng Zsh. Hãy đảm bảo bạn đổi shell mặc định bằng lệnh: chsh -s /usr/bin/zsh"
+    MSG_ZSH_NOTE="LƯU Ý: Kitty config sử dụng Zsh. Hãy đảm bảo bạn đổi shell mặc định bằng lệnh: chsh -s /usr/bin/zsh"
 else
     MSG_START="Starting Arch Novaland installation..."
     MSG_ERR_ROOT="ERROR: Do not run this script as root (sudo)."
@@ -77,7 +79,7 @@ else
     MSG_CHECK_ARCH="Checking system..."
     MSG_NOT_ARCH="WARNING: You are not on Arch Linux."
     MSG_UPDATE_SYS="Updating package database (pacman -Sy)..."
-    MSG_INSTALL_PKG="Installing dependencies (Core)..."
+    MSG_INSTALL_PKG="Installing dependencies (Hyprland, Python/PyQt6, Fonts)..."
     MSG_BACKUP="Backing up old configs to: $BACKUP_DIR"
     MSG_FIX_PATH="Updating user paths and configs..."
     MSG_MONITOR_FIX="Configuring Hyprland to auto-detect best monitor mode..."
@@ -86,7 +88,7 @@ else
     MSG_INSTALL_P10K="Downloading Powerlevel10k theme..."
     MSG_ZSH_COPY="Installing Zsh configuration (.zshrc)..."
     MSG_WALLPAPER="Copying wallpapers to ~/Pictures/Wallpapers..."
-    MSG_WALLPAPER_FIX="Fixing wallpaper config (pointing to default image)..."
+    MSG_WALLPAPER_FIX="Fixing wallpaper config..."
     MSG_SDDM_ASK="Do you want to install and enable SDDM + Sugar Candy Theme? (y/n): "
     MSG_SDDM_INSTALL="Installing SDDM packages and Theme..."
     MSG_DONE="INSTALLATION COMPLETE! Please reboot your system."
@@ -120,15 +122,16 @@ sudo pacman -Sy --noconfirm 2>&1 | tee -a "$LOG"
 
 log_msg "${YELLOW}$MSG_INSTALL_PKG${NC}"
 
+# [UPDATED] Added python-pyqt6 for Novaland Center and jq/imagemagick for utilities
 PKGS=(
     hyprland hyprpaper hyprlock waybar rofi-wayland swaync wlogout
-    kitty zsh curl git thunar
+    kitty zsh curl git thunar jq
     pipewire wireplumber pavucontrol playerctl cava
     brightnessctl libnotify power-profiles-daemon polkit-gnome
-    wl-clipboard grim slurp swappy
+    wl-clipboard grim slurp swappy imagemagick
     nm-connection-editor network-manager-applet blueman
     ttf-jetbrains-mono-nerd ttf-hack-nerd noto-fonts-emoji
-    python-requests fastfetch
+    python-requests python-pyqt6 fastfetch
 )
 
 if ! command -v yay &> /dev/null && ! command -v paru &> /dev/null; then
@@ -153,8 +156,10 @@ sudo systemctl enable --now power-profiles-daemon >> "$LOG" 2>&1 || true
 
 # --- 3. FIX PATHS & PREPARE ---
 log_msg "${YELLOW}$MSG_FIX_PATH${NC}"
+# Tìm và thay thế username cũ trong các file config bằng username hiện tại
 find "$SRC_DIR" -type f -exec sed -i "s|/home/$ORIGIN_USER|/home/$CURRENT_USER|g" {} +
 
+# Disable fcitx5 by default to avoid confusion
 if [ -f "$SRC_DIR/configs/hypr/hyprland.conf" ]; then
     sed -i 's/^exec-once = fcitx5/# exec-once = fcitx5/g' "$SRC_DIR/configs/hypr/hyprland.conf"
 fi
@@ -212,7 +217,9 @@ else
     log_msg "${YELLOW}  -> Warning: .zshrc not found.${NC}"
 fi
 
+# [UPDATED] Cấp quyền thực thi cho cả script .sh và .py (cho Novaland Center)
 chmod +x "$HOME/.config/hypr/scripts/"*.sh
+chmod +x "$HOME/.config/hypr/scripts/"*.py 2>/dev/null || true
 chmod +x "$HOME/.config/waybar/scripts/"*
 
 # [NEW] Wallpapers & Fix
@@ -234,10 +241,10 @@ if [ -d "$SRC_DIR/configs/hypr/wallpapers" ]; then
     cp -r "$SRC_DIR/configs/hypr/wallpapers/"* "$HOME/Pictures/Wallpapers/"
 fi
 
-# [NEW] Tự động sửa config hyprpaper để trỏ vào ảnh mặc định
+# [UPDATED] Fix hyprpaper config if needed (để đảm bảo ảnh mặc định tồn tại)
 log_msg "${YELLOW}$MSG_WALLPAPER_FIX${NC}"
 if [ -f "$HOME/.config/hypr/hyprpaper.conf" ]; then
-    # Thay thế file ảnh bị thiếu (Stargazing-min.png) bằng ảnh mặc định (Default_Novaland.jpg)
+    # Thay thế file ảnh bị thiếu bằng ảnh mặc định (Default_Novaland.jpg)
     sed -i "s|Stargazing-min.png|Default_Novaland.jpg|g" "$HOME/.config/hypr/hyprpaper.conf"
     log_msg "  -> Fixed hyprpaper.conf to use Default_Novaland.jpg"
 fi
