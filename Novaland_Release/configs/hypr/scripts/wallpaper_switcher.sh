@@ -101,19 +101,29 @@ if [ -z "$selected_name" ]; then
     exit 0
 fi
 
-# --- 4. XỬ LÝ ĐỔI ẢNH ---
+# ... (Các phần trên giữ nguyên) ...
+
+# --- 4. XỬ LÝ ĐỔI ẢNH (Runtime vẫn dùng hyprctl bình thường) ---
 FULL_PATH="$WALLPAPER_DIR/$selected_name"
 
 echo "Changing to: $FULL_PATH"
 
+# Preload và Apply ngay lập tức
 hyprctl hyprpaper preload "$FULL_PATH"
 hyprctl hyprpaper wallpaper ",$FULL_PATH"
 hyprctl hyprpaper unload unused
 
-# Lưu config
-echo "preload = $FULL_PATH" > "$CONFIG_FILE"
-echo "wallpaper = ,$FULL_PATH" >> "$CONFIG_FILE"
-echo "splash = false" >> "$CONFIG_FILE"
+# --- LƯU CONFIG (CẬP NHẬT SYNTAX MỚI: BLOCK STYLE) ---
+# Dùng cat <<EOF để viết block config dễ nhìn hơn
+cat > "$CONFIG_FILE" <<EOF
+ipc = on
+splash = false
+
+wallpaper {
+    monitor =
+    path = $FULL_PATH
+}
+EOF
 
 # Thông báo
 notify-send "Wallpaper Gallery" "Đã chọn: $selected_name" -i "$FULL_PATH"
