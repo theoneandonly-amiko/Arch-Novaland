@@ -1,0 +1,16 @@
+{
+  "enabled": "yes",
+  "bezier": {
+    "workEase": [0.32, 0.0, 0.58, 1.0],
+    "softMove": [0.25, 0.8, 0.5, 1.0]
+  },
+  "animations": [
+    ["workspaces", 1, 9, "workEase", "slidefade"],
+    ["windows", 1, 6, "softMove", "slide"],
+    ["windowsOut", 1, 6, "softMove", "slide"],
+    ["windowsMove", 1, 5, "softMove"],
+    ["border", 1, 8, "workEase"],
+    ["fade", 1, 10, "softMove"],
+    ["fadeDim", 1, 10, "softMove"]
+  ]
+}

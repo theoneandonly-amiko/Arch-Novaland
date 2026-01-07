@@ -1,0 +1,14 @@
+{
+  "enabled": "yes",
+  "bezier": {
+    "linear": [0.0, 0.0, 1.0, 1.0]
+  },
+  "animations": [
+    ["windows", 1, 2, "linear"],
+    ["windowsOut", 1, 2, "linear"],
+    ["windowsMove", 1, 1, "linear"],
+    ["fade", 1, 2, "linear"],
+    ["fadeDim", 1, 2, "linear"],
+    ["workspaces", 1, 2, "linear"]
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "enabled": "yes",
+  "bezier": {
+    "elegant": [0.25, 0.1, 0.25, 1.0]
+  },
+  "animations": [
+    ["workspaces", 1, 8, "elegant", "fade"],
+    ["windows", 1, 6, "elegant"],
+    ["windowsOut", 1, 6, "elegant"],
+    ["windowsMove", 1, 5, "elegant"],
+    ["border", 1, 9, "elegant"],
+    ["fade", 1, 8, "elegant"],
+    ["fadeDim", 1, 8, "elegant"]
+  ]
+}

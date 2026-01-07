@@ -1,0 +1,15 @@
+{
+  "enabled": "yes",
+  "bezier": {
+    "overshot": [0.05, 0.9, 0.1, 1.05],
+    "bounce": [0.2, 1.4, 0.6, -0.4]
+  },
+  "animations": [
+    ["windows", 1, 10, "overshot", "slide"],
+    ["windowsOut", 1, 10, "bounce", "slide"],
+    ["windowsMove", 1, 8, "overshot"],
+    ["fade", 1, 10, "bounce"],
+    ["fadeDim", 1, 10, "bounce"],
+    ["workspaces", 1, 9, "overshot"]
+  ]
+}

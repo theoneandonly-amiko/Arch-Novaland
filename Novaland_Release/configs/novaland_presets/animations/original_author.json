@@ -1,0 +1,16 @@
+{
+  "enabled": "yes",
+  "bezier": {
+    "novaIn": [0.22, 1.0, 0.4, 1.0],
+    "novaOut": [0.4, 0.0, 0.6, 1.0]
+  },
+  "animations": [
+    ["windows", 1, 8, "novaIn", "slide"],
+    ["windowsOut", 1, 7, "novaOut", "slide"],
+    ["windowsMove", 1, 5, "default"],
+    ["border", 1, 9, "novaIn"],
+    ["fade", 1, 10, "novaIn"],
+    ["fadeDim", 1, 10, "novaIn"],
+    ["workspaces", 1, 7, "default"]
+  ]
+}
