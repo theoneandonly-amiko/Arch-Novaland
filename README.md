@@ -1,14 +1,14 @@
-# 🌌 Arch Novaland
+# Arch Novaland
 
-# 📖 Introduction
+# Introduction
 
 Welcome to Arch Novaland. This is a comprehensive "rice" (configuration) for Hyprland on Arch Linux, designed with a focus on Neon Aesthetics and Smooth Animations. It features a custom mascot-themed environment centered around the character Neonova Solara.
 This is a very minimal Hyprland Rice! Expects missing features!
-# 🖼️ Preview
+# Preview
 
 https://github.com/user-attachments/assets/df5c5904-0104-49d3-a53e-da35170d38ed
 
-# ✨ Features
+# Features
 
 Window Manager: Hyprland.
 
@@ -26,7 +26,7 @@ Notifications: SwayNC (Control Center).
 
 Logout Menu: Wlogout.
 
-# 🚀 Installation
+# Installation
 
 ## Prerequisites
 
@@ -55,7 +55,7 @@ chmod +x install.sh
 - The script supports both English and Vietnamese.
 - It will automatically backup your old configs to ~/.config/Novaland_Backup_... before making changes.
 
-# ⌨️ Keybinds (Cheatsheet)
+# Keybinds (Cheatsheet) (might change xd)
 
 | Key Combination | Action |
 | :--- | :--- |
@@ -73,12 +73,12 @@ chmod +x install.sh
 | Print Screen (PrtSrn) | Capture region |
 | Shift + Print Screen | Screenshot (Region -> Clipboard) |
 
-# 🤝 Credits
+# Credits
 - Configuration & Rice: Neonova Solara (Amiko)
 - Mascot Design & Art: Norielle
 - Base Components: Hyprland, Waybar, Rofi, Cava, and a lot more!
 
-# ⚠️ License & Usage
+# License & Usage
 
 This project uses a Hybrid License model:
 
